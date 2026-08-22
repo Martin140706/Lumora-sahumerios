@@ -1,34 +1,34 @@
 // ========================================
-// PRODUCTOS
+// PRODUCTOS - AROMANZA TIBETANOS
 // ========================================
 
 const tibetanos = [
-  "Berry Kiss",
-  "Citronella",
-  "Coco",
-  "Diamante Negro",
-  "Dulces Frutillas",
-  "Frescura del Bosque",
-  "Frutos Rojos",
-  "Gardenias Flores Blancas",
-  "Incienso Consagrado",
-  "Lavandas del Valle",
-  "Manzana Canela",
-  "Miel Orgánica",
-  "Mirra Consagrada",
-  "Néctar de los Dioses",
-  "Premium Lemon",
-  "Protección Energética",
-  "Real Champa",
-  "Rosa Real",
-  "Super Palo Santo",
-  "Sándalo Hindú",
-  "Canela Mística",
-  "Choco Dubai",
-  "Cappuccino Italiano",
-  "Energía Reiki",
-  "Flores de Manzanilla",
-  "Titanium",
+  { nombre: "Berry Kiss", stock: 5 },
+  { nombre: "Citronella", stock: 5 },
+  { nombre: "Coco", stock: 5 },
+  { nombre: "Diamante Negro", stock: 5 },
+  { nombre: "Dulces Frutillas", stock: 5 },
+  { nombre: "Frescura del Bosque", stock: 5 },
+  { nombre: "Frutos Rojos", stock: 5 },
+  { nombre: "Gardenias Flores Blancas", stock: 5 },
+  { nombre: "Incienso Consagrado", stock: 5 },
+  { nombre: "Lavandas del Valle", stock: 5 },
+  { nombre: "Manzana Canela", stock: 5 },
+  { nombre: "Miel Orgánica", stock: 5 },
+  { nombre: "Mirra Consagrada", stock: 5 },
+  { nombre: "Néctar de los Dioses", stock: 5 },
+  { nombre: "Premium Lemon", stock: 5 },
+  { nombre: "Protección Energética", stock: 5 },
+  { nombre: "Real Champa", stock: 5 },
+  { nombre: "Rosa Real", stock: 5 },
+  { nombre: "Super Palo Santo", stock: 5 },
+  { nombre: "Sándalo Hindú", stock: 5 },
+  { nombre: "Canela Mística", stock: 5 },
+  { nombre: "Choco Dubai", stock: 5 },
+  { nombre: "Cappuccino Italiano", stock: 5 },
+  { nombre: "Energía Reiki", stock: 5 },
+  { nombre: "Flores de Manzanilla", stock: 5 },
+  { nombre: "Titanium", stock: 5 },
 ];
 
 const precioTibetanos = 2800;
@@ -88,96 +88,171 @@ function actualizarBotonCarrito() {
 }
 
 // ========================================
-// PÁGINA TIBETANOS
+// LISTA DE TIBETANOS
 // ========================================
 
 const listaTibetanos = document.getElementById("lista-tibetanos");
 
 if (listaTibetanos) {
-  tibetanos.forEach((aroma) => {
+  tibetanos.forEach((productoTibetano) => {
+    const aroma = productoTibetano.nombre;
+
+    const stock = productoTibetano.stock;
+
     const producto = document.createElement("div");
 
     producto.classList.add("producto-lista");
 
     let cantidad = carrito[aroma] || 0;
 
-    producto.innerHTML = `
+    // ========================================
+    // AGOTADO
+    // ========================================
 
-            <span class="nombre-producto">
-                ${aroma}
-            </span>
+    if (stock <= 0) {
+      producto.innerHTML = `
 
-            <div class="cantidad">
-
-                <button class="menos">
-                    −
-                </button>
-
-                <span class="numero">
-                    ${cantidad}
+                <span class="nombre-producto">
+                    ${aroma}
                 </span>
 
-                <button class="mas">
-                    +
-                </button>
+                <span class="agotado">
+                    AGOTADO
+                </span>
 
-            </div>
+            `;
 
-        `;
+      // Si estaba en el carrito
+      // y ahora está agotado,
+      // lo eliminamos.
 
-    const botonMenos = producto.querySelector(".menos");
+      if (carrito[aroma]) {
+        delete carrito[aroma];
 
-    const botonMas = producto.querySelector(".mas");
-
-    const numero = producto.querySelector(".numero");
-
-    // ========================================
-    // SUMAR
-    // ========================================
-
-    botonMas.addEventListener("click", () => {
-      // Obtener cantidad real
-      cantidad = carrito[aroma] || 0;
-
-      cantidad++;
-
-      numero.textContent = cantidad;
-
-      carrito[aroma] = cantidad;
-
-      guardarCarrito();
-
-      mostrarNotificacion(`✓ ${aroma} × ${cantidad}`);
-
-      actualizarBotonCarrito();
-    });
+        guardarCarrito();
+      }
+    }
 
     // ========================================
-    // RESTAR
+    // DISPONIBLE
     // ========================================
+    else {
+      producto.innerHTML = `
 
-    botonMenos.addEventListener("click", () => {
-      // Obtener cantidad real
-      cantidad = carrito[aroma] || 0;
+                <span class="nombre-producto">
+                    ${aroma}
+                </span>
 
-      if (cantidad > 0) {
-        cantidad--;
+                <span class="mensaje-stock"></span>
+
+                <div class="cantidad">
+
+                    <button class="menos">
+                        −
+                    </button>
+
+                    <span class="numero">
+                        ${cantidad}
+                    </span>
+
+                    <button class="mas">
+                        +
+                    </button>
+
+                </div>
+
+            `;
+
+      const botonMenos = producto.querySelector(".menos");
+
+      const botonMas = producto.querySelector(".mas");
+
+      const numero = producto.querySelector(".numero");
+
+      const mensajeStock = producto.querySelector(".mensaje-stock");
+
+      // ========================================
+      // MENSAJE DE STOCK
+      // ========================================
+
+      function actualizarMensajeStock() {
+        const cantidadActual = carrito[aroma] || 0;
+
+        const unidadesRestantes = stock - cantidadActual;
+
+        if (unidadesRestantes > 0 && unidadesRestantes <= 2) {
+          mensajeStock.textContent = "⚠️ Últimas unidades";
+
+          mensajeStock.classList.add("mostrar-stock");
+        } else {
+          mensajeStock.textContent = "";
+
+          mensajeStock.classList.remove("mostrar-stock");
+        }
+      }
+
+      // Mostrar mensaje al cargar
+
+      actualizarMensajeStock();
+
+      // ========================================
+      // SUMAR
+      // ========================================
+
+      botonMas.addEventListener("click", () => {
+        cantidad = carrito[aroma] || 0;
+
+        // No superar stock
+
+        if (cantidad >= stock) {
+          mostrarNotificacion("⚠️ No hay más unidades disponibles");
+
+          return;
+        }
+
+        cantidad++;
+
+        carrito[aroma] = cantidad;
 
         numero.textContent = cantidad;
 
-        if (cantidad === 0) {
-          delete carrito[aroma];
-        } else {
-          carrito[aroma] = cantidad;
-        }
-
         guardarCarrito();
+
+        actualizarMensajeStock();
 
         mostrarNotificacion(`✓ ${aroma} × ${cantidad}`);
 
         actualizarBotonCarrito();
-      }
-    });
+      });
+
+      // ========================================
+      // RESTAR
+      // ========================================
+
+      botonMenos.addEventListener("click", () => {
+        cantidad = carrito[aroma] || 0;
+
+        if (cantidad > 0) {
+          cantidad--;
+
+          if (cantidad === 0) {
+            delete carrito[aroma];
+          } else {
+            carrito[aroma] = cantidad;
+          }
+
+          numero.textContent = cantidad;
+
+          guardarCarrito();
+
+          actualizarMensajeStock();
+
+          mostrarNotificacion(`✓ ${aroma} × ${cantidad}`);
+
+          actualizarBotonCarrito();
+        }
+      });
+    }
 
     listaTibetanos.appendChild(producto);
   });
@@ -199,6 +274,8 @@ function actualizarCantidadesTibetanos() {
 
     const numero = producto.querySelector(".numero");
 
+    if (!numero) return;
+
     const cantidad = carrito[nombre] || 0;
 
     numero.textContent = cantidad;
@@ -215,6 +292,10 @@ if (listaCarrito) {
   mostrarCarrito();
 }
 
+// ========================================
+// MOSTRAR CARRITO
+// ========================================
+
 function mostrarCarrito() {
   listaCarrito.innerHTML = "";
 
@@ -228,9 +309,11 @@ function mostrarCarrito() {
 
   if (productos.length === 0) {
     listaCarrito.innerHTML = `
+
             <p class="carrito-vacio">
                 Tu carrito está vacío.
             </p>
+
         `;
 
     actualizarTotalCarrito(0);
@@ -239,7 +322,7 @@ function mostrarCarrito() {
   }
 
   // ========================================
-  // MOSTRAR PRODUCTOS
+  // PRODUCTOS DEL CARRITO
   // ========================================
 
   productos.forEach((aroma) => {
@@ -301,7 +384,19 @@ function mostrarCarrito() {
     // ========================================
 
     botonMas.addEventListener("click", () => {
+      const productoStock = tibetanos.find(
+        (producto) => producto.nombre === aroma,
+      );
+
+      const stock = productoStock ? productoStock.stock : 0;
+
       cantidad = carrito[aroma] || 0;
+
+      if (cantidad >= stock) {
+        mostrarNotificacion("⚠️ No hay más unidades disponibles");
+
+        return;
+      }
 
       cantidad++;
 
@@ -343,7 +438,7 @@ function mostrarCarrito() {
 }
 
 // ========================================
-// TOTAL
+// TOTAL DEL CARRITO
 // ========================================
 
 function actualizarTotalCarrito(total) {
@@ -407,8 +502,6 @@ const botonWhatsapp = document.getElementById("whatsapp");
 if (botonWhatsapp) {
   botonWhatsapp.addEventListener("click", () => {
     const productos = Object.keys(carrito);
-
-    // Carrito vacío
 
     if (productos.length === 0) {
       alert("Tu carrito está vacío.");
