@@ -1,39 +1,4 @@
 // ========================================
-// PRODUCTOS - AROMANZA TIBETANOS
-// ========================================
-
-const tibetanos = [
-  { nombre: "Berry Kiss", stock: 5 },
-  { nombre: "Citronella", stock: 5 },
-  { nombre: "Coco", stock: 5 },
-  { nombre: "Diamante Negro", stock: 5 },
-  { nombre: "Dulces Frutillas", stock: 5 },
-  { nombre: "Frescura del Bosque", stock: 5 },
-  { nombre: "Frutos Rojos", stock: 5 },
-  { nombre: "Gardenias Flores Blancas", stock: 5 },
-  { nombre: "Incienso Consagrado", stock: 5 },
-  { nombre: "Lavandas del Valle", stock: 5 },
-  { nombre: "Manzana Canela", stock: 5 },
-  { nombre: "Miel Orgánica", stock: 5 },
-  { nombre: "Mirra Consagrada", stock: 5 },
-  { nombre: "Néctar de los Dioses", stock: 5 },
-  { nombre: "Premium Lemon", stock: 5 },
-  { nombre: "Protección Energética", stock: 5 },
-  { nombre: "Real Champa", stock: 5 },
-  { nombre: "Rosa Real", stock: 5 },
-  { nombre: "Super Palo Santo", stock: 5 },
-  { nombre: "Sándalo Hindú", stock: 5 },
-  { nombre: "Canela Mística", stock: 5 },
-  { nombre: "Choco Dubai", stock: 5 },
-  { nombre: "Cappuccino Italiano", stock: 5 },
-  { nombre: "Energía Reiki", stock: 5 },
-  { nombre: "Flores de Manzanilla", stock: 5 },
-  { nombre: "Titanium", stock: 5 },
-];
-
-const precioTibetanos = 2800;
-
-// ========================================
 // CARRITO
 // ========================================
 
@@ -76,8 +41,8 @@ function actualizarBotonCarrito() {
 
   let cantidadTotal = 0;
 
-  for (const aroma in carrito) {
-    cantidadTotal += carrito[aroma];
+  for (const id in carrito) {
+    cantidadTotal += carrito[id].cantidad;
   }
 
   if (cantidadTotal > 0) {
@@ -88,208 +53,234 @@ function actualizarBotonCarrito() {
 }
 
 // ========================================
-// LISTA DE TIBETANOS
+// DETECTAR CATEGORÍA
 // ========================================
 
-const listaTibetanos = document.getElementById("lista-tibetanos");
+function obtenerCategoria() {
+  const pagina = window.location.pathname
+    .split("/")
+    .pop()
+    .replace(".html", "")
+    .toLowerCase();
 
-if (listaTibetanos) {
-  tibetanos.forEach((productoTibetano) => {
-    const aroma = productoTibetano.nombre;
+  return pagina;
+}
 
-    const stock = productoTibetano.stock;
+// ========================================
+// CARGAR PRODUCTOS
+// ========================================
 
-    const producto = document.createElement("div");
+function cargarProductos() {
+  const lista = document.querySelector("[id^='lista-']");
 
-    producto.classList.add("producto-lista");
+  if (!lista) return;
 
-    let cantidad = carrito[aroma] || 0;
+  const categoria = obtenerCategoria();
 
-    // ========================================
-    // AGOTADO
-    // ========================================
+  const datos = catalogo[categoria];
 
-    if (stock <= 0) {
-      producto.innerHTML = `
+  if (!datos) {
+    console.warn("No se encontró la categoría:", categoria);
 
-                <span class="nombre-producto">
-                    ${aroma}
-                </span>
+    return;
+  }
 
-                <span class="agotado">
-                    AGOTADO
-                </span>
-
-            `;
-
-      // Si estaba en el carrito
-      // y ahora está agotado,
-      // lo eliminamos.
-
-      if (carrito[aroma]) {
-        delete carrito[aroma];
-
-        guardarCarrito();
-      }
-    }
-
-    // ========================================
-    // DISPONIBLE
-    // ========================================
-    else {
-      producto.innerHTML = `
-
-                <span class="nombre-producto">
-                    ${aroma}
-                </span>
-
-                <span class="mensaje-stock"></span>
-
-                <div class="cantidad">
-
-                    <button class="menos">
-                        −
-                    </button>
-
-                    <span class="numero">
-                        ${cantidad}
-                    </span>
-
-                    <button class="mas">
-                        +
-                    </button>
-
-                </div>
-
-            `;
-
-      const botonMenos = producto.querySelector(".menos");
-
-      const botonMas = producto.querySelector(".mas");
-
-      const numero = producto.querySelector(".numero");
-
-      const mensajeStock = producto.querySelector(".mensaje-stock");
-
-      // ========================================
-      // MENSAJE DE STOCK
-      // ========================================
-
-      function actualizarMensajeStock() {
-        const cantidadActual = carrito[aroma] || 0;
-
-        const unidadesRestantes = stock - cantidadActual;
-
-        if (unidadesRestantes > 0 && unidadesRestantes <= 2) {
-          mensajeStock.textContent = "⚠️ Últimas unidades";
-
-          mensajeStock.classList.add("mostrar-stock");
-        } else {
-          mensajeStock.textContent = "";
-
-          mensajeStock.classList.remove("mostrar-stock");
-        }
-      }
-
-      // Mostrar mensaje al cargar
-
-      actualizarMensajeStock();
-
-      // ========================================
-      // SUMAR
-      // ========================================
-
-      botonMas.addEventListener("click", () => {
-        cantidad = carrito[aroma] || 0;
-
-        // No superar stock
-
-        if (cantidad >= stock) {
-          mostrarNotificacion("⚠️ No hay más unidades disponibles");
-
-          return;
-        }
-
-        cantidad++;
-
-        carrito[aroma] = cantidad;
-
-        numero.textContent = cantidad;
-
-        guardarCarrito();
-
-        actualizarMensajeStock();
-
-        mostrarNotificacion(`✓ ${aroma} × ${cantidad}`);
-
-        actualizarBotonCarrito();
-      });
-
-      // ========================================
-      // RESTAR
-      // ========================================
-
-      botonMenos.addEventListener("click", () => {
-        cantidad = carrito[aroma] || 0;
-
-        if (cantidad > 0) {
-          cantidad--;
-
-          if (cantidad === 0) {
-            delete carrito[aroma];
-          } else {
-            carrito[aroma] = cantidad;
-          }
-
-          numero.textContent = cantidad;
-
-          guardarCarrito();
-
-          actualizarMensajeStock();
-
-          mostrarNotificacion(`✓ ${aroma} × ${cantidad}`);
-
-          actualizarBotonCarrito();
-        }
-      });
-    }
-
-    listaTibetanos.appendChild(producto);
+  datos.productos.forEach((productoDatos) => {
+    crearProducto(lista, productoDatos, datos);
   });
 }
 
 // ========================================
-// ACTUALIZAR CANTIDADES AL VOLVER
+// CREAR PRODUCTO
 // ========================================
 
-function actualizarCantidadesTibetanos() {
-  if (!listaTibetanos) return;
+function crearProducto(lista, productoDatos, datos) {
+  const id = productoDatos.id;
 
-  const productos = listaTibetanos.querySelectorAll(".producto-lista");
+  const nombre = productoDatos.nombre;
 
-  productos.forEach((producto) => {
-    const nombre = producto
-      .querySelector(".nombre-producto")
-      .textContent.trim();
+  const stock = productoDatos.stock;
+
+  const producto = document.createElement("div");
+
+  producto.classList.add("producto-lista");
+
+  // Cantidad actual del carrito
+
+  const cantidad = carrito[id] ? carrito[id].cantidad : 0;
+
+  // ========================================
+  // AGOTADO
+  // ========================================
+
+  if (stock <= 0) {
+    producto.innerHTML = `
+
+      <span class="nombre-producto">
+        ${nombre}
+      </span>
+
+      <span></span>
+
+      <span class="agotado">
+        AGOTADO
+      </span>
+
+    `;
+  }
+
+  // ========================================
+  // DISPONIBLE
+  // ========================================
+  else {
+    producto.innerHTML = `
+
+      <span class="nombre-producto">
+        ${nombre}
+      </span>
+
+      <span class="mensaje-stock"></span>
+
+      <div class="cantidad">
+
+        <button class="menos">
+          −
+        </button>
+
+        <span class="numero">
+          ${cantidad}
+        </span>
+
+        <button class="mas">
+          +
+        </button>
+
+      </div>
+
+    `;
+
+    const botonMenos = producto.querySelector(".menos");
+
+    const botonMas = producto.querySelector(".mas");
 
     const numero = producto.querySelector(".numero");
 
-    if (!numero) return;
+    const mensajeStock = producto.querySelector(".mensaje-stock");
 
-    const cantidad = carrito[nombre] || 0;
+    // ========================================
+    // MENSAJE DE STOCK
+    // ========================================
 
-    numero.textContent = cantidad;
-  });
+    function actualizarMensajeStock() {
+      const cantidadActual = carrito[id] ? carrito[id].cantidad : 0;
+
+      const restantes = stock - cantidadActual;
+
+      if (restantes > 0 && restantes <= 2) {
+        mensajeStock.textContent = "⚠️ Últimas unidades";
+
+        mensajeStock.classList.add("mostrar-stock");
+      } else {
+        mensajeStock.textContent = "";
+
+        mensajeStock.classList.remove("mostrar-stock");
+      }
+    }
+
+    actualizarMensajeStock();
+
+    // ========================================
+    // SUMAR
+    // ========================================
+
+    botonMas.addEventListener("click", () => {
+      const cantidadActual = carrito[id] ? carrito[id].cantidad : 0;
+
+      if (cantidadActual >= stock) {
+        mostrarNotificacion("⚠️ No hay más unidades disponibles");
+
+        return;
+      }
+
+      const nuevaCantidad = cantidadActual + 1;
+
+      carrito[id] = {
+        cantidad: nuevaCantidad,
+        nombre: nombre,
+        precio: datos.precio,
+        categoria: datos.nombre,
+      };
+
+      numero.textContent = nuevaCantidad;
+
+      guardarCarrito();
+
+      actualizarMensajeStock();
+
+      actualizarBotonCarrito();
+
+      mostrarNotificacion(`✓ ${nombre} × ${nuevaCantidad}`);
+    });
+
+    // ========================================
+    // RESTAR
+    // ========================================
+
+    botonMenos.addEventListener("click", () => {
+      const cantidadActual = carrito[id] ? carrito[id].cantidad : 0;
+
+      if (cantidadActual <= 0) {
+        return;
+      }
+
+      const nuevaCantidad = cantidadActual - 1;
+
+      if (nuevaCantidad === 0) {
+        delete carrito[id];
+      } else {
+        carrito[id] = {
+          ...carrito[id],
+          cantidad: nuevaCantidad,
+        };
+      }
+
+      numero.textContent = nuevaCantidad;
+
+      guardarCarrito();
+
+      actualizarMensajeStock();
+
+      actualizarBotonCarrito();
+
+      mostrarNotificacion(`✓ ${nombre} × ${nuevaCantidad}`);
+    });
+  }
+
+  lista.appendChild(producto);
 }
 
 // ========================================
-// PÁGINA DEL CARRITO
+// BUSCAR PRODUCTO POR ID
 // ========================================
 
-const listaCarrito = document.getElementById("carrito");
+function buscarProducto(id) {
+  for (const categoria in catalogo) {
+    const datos = catalogo[categoria];
 
-if (listaCarrito) {
-  mostrarCarrito();
+    const producto = datos.productos.find((producto) => producto.id === id);
+
+    if (producto) {
+      return {
+        ...producto,
+
+        precio: datos.precio,
+
+        categoria: datos.nombre,
+      };
+    }
+  }
+
+  return null;
 }
 
 // ========================================
@@ -297,7 +288,11 @@ if (listaCarrito) {
 // ========================================
 
 function mostrarCarrito() {
-  listaCarrito.innerHTML = "";
+  const lista = document.getElementById("carrito");
+
+  if (!lista) return;
+
+  lista.innerHTML = "";
 
   let total = 0;
 
@@ -308,13 +303,13 @@ function mostrarCarrito() {
   // ========================================
 
   if (productos.length === 0) {
-    listaCarrito.innerHTML = `
+    lista.innerHTML = `
 
-            <p class="carrito-vacio">
-                Tu carrito está vacío.
-            </p>
+      <p class="carrito-vacio">
+        Tu carrito está vacío.
+      </p>
 
-        `;
+    `;
 
     actualizarTotalCarrito(0);
 
@@ -322,13 +317,21 @@ function mostrarCarrito() {
   }
 
   // ========================================
-  // PRODUCTOS DEL CARRITO
+  // PRODUCTOS
   // ========================================
 
-  productos.forEach((aroma) => {
-    let cantidad = carrito[aroma];
+  productos.forEach((id) => {
+    const item = carrito[id];
 
-    const subtotal = cantidad * precioTibetanos;
+    const datosProducto = buscarProducto(id);
+
+    if (!datosProducto) return;
+
+    const cantidad = item.cantidad;
+
+    const precio = datosProducto.precio;
+
+    const subtotal = cantidad * precio;
 
     total += subtotal;
 
@@ -338,69 +341,79 @@ function mostrarCarrito() {
 
     producto.innerHTML = `
 
-            <div class="info-carrito">
+      <div class="info-carrito">
 
-                <h3>
-                    ${aroma}
-                </h3>
+        <h3>
+          ${datosProducto.nombre}
+        </h3>
 
-                <p>
-                    $${precioTibetanos.toLocaleString("es-AR")}
-                    c/u
-                </p>
+        <p>
+          ${datosProducto.categoria}
+        </p>
 
-            </div>
+        <p>
+          $${precio.toLocaleString("es-AR")}
+          c/u
+        </p>
 
-
-            <div class="cantidad-carrito">
-
-                <button class="menos-carrito">
-                    −
-                </button>
-
-                <span class="numero-carrito">
-                    ${cantidad}
-                </span>
-
-                <button class="mas-carrito">
-                    +
-                </button>
-
-            </div>
+      </div>
 
 
-            <strong class="subtotal-carrito">
-                $${subtotal.toLocaleString("es-AR")}
-            </strong>
+      <div class="cantidad-carrito">
 
-        `;
+        <button class="menos-carrito">
+          −
+        </button>
 
-    const botonMenos = producto.querySelector(".menos-carrito");
+        <span class="numero-carrito">
+          ${cantidad}
+        </span>
 
-    const botonMas = producto.querySelector(".mas-carrito");
+        <button class="mas-carrito">
+          +
+        </button>
+
+      </div>
+
+
+      <strong class="subtotal-carrito">
+        $${subtotal.toLocaleString("es-AR")}
+      </strong>
+
+    `;
 
     // ========================================
-    // SUMAR DESDE CARRITO
+    // RESTAR DESDE EL CARRITO
     // ========================================
 
-    botonMas.addEventListener("click", () => {
-      const productoStock = tibetanos.find(
-        (producto) => producto.nombre === aroma,
-      );
+    producto.querySelector(".menos-carrito").addEventListener("click", () => {
+      if (carrito[id].cantidad > 1) {
+        carrito[id].cantidad--;
+      } else {
+        delete carrito[id];
+      }
 
-      const stock = productoStock ? productoStock.stock : 0;
+      guardarCarrito();
 
-      cantidad = carrito[aroma] || 0;
+      mostrarCarrito();
 
-      if (cantidad >= stock) {
+      actualizarBotonCarrito();
+    });
+
+    // ========================================
+    // SUMAR DESDE EL CARRITO
+    // ========================================
+
+    producto.querySelector(".mas-carrito").addEventListener("click", () => {
+      const stock = datosProducto.stock;
+
+      if (carrito[id].cantidad >= stock) {
         mostrarNotificacion("⚠️ No hay más unidades disponibles");
 
         return;
       }
 
-      cantidad++;
-
-      carrito[aroma] = cantidad;
+      carrito[id].cantidad++;
 
       guardarCarrito();
 
@@ -409,29 +422,7 @@ function mostrarCarrito() {
       actualizarBotonCarrito();
     });
 
-    // ========================================
-    // RESTAR DESDE CARRITO
-    // ========================================
-
-    botonMenos.addEventListener("click", () => {
-      cantidad = carrito[aroma] || 0;
-
-      cantidad--;
-
-      if (cantidad <= 0) {
-        delete carrito[aroma];
-      } else {
-        carrito[aroma] = cantidad;
-      }
-
-      guardarCarrito();
-
-      mostrarCarrito();
-
-      actualizarBotonCarrito();
-    });
-
-    listaCarrito.appendChild(producto);
+    lista.appendChild(producto);
   });
 
   actualizarTotalCarrito(total);
@@ -442,11 +433,11 @@ function mostrarCarrito() {
 // ========================================
 
 function actualizarTotalCarrito(total) {
-  const totalCarrito = document.getElementById("total-carrito");
+  const elemento = document.getElementById("total-carrito");
 
-  if (!totalCarrito) return;
+  if (!elemento) return;
 
-  totalCarrito.textContent = total.toLocaleString("es-AR");
+  elemento.textContent = total.toLocaleString("es-AR");
 }
 
 // ========================================
@@ -455,37 +446,11 @@ function actualizarTotalCarrito(total) {
 
 const botonVaciar = document.getElementById("vaciar-carrito");
 
-const modalVaciar = document.getElementById("modal-vaciar");
-
-const botonCancelar = document.getElementById("cancelar-vaciar");
-
-const botonConfirmar = document.getElementById("confirmar-vaciar");
-
-// Abrir modal
-
 if (botonVaciar) {
   botonVaciar.addEventListener("click", () => {
-    modalVaciar.classList.add("mostrar");
-  });
-}
-
-// Cancelar
-
-if (botonCancelar) {
-  botonCancelar.addEventListener("click", () => {
-    modalVaciar.classList.remove("mostrar");
-  });
-}
-
-// Confirmar
-
-if (botonConfirmar) {
-  botonConfirmar.addEventListener("click", () => {
     carrito = {};
 
     guardarCarrito();
-
-    modalVaciar.classList.remove("mostrar");
 
     mostrarCarrito();
 
@@ -513,22 +478,23 @@ if (botonWhatsapp) {
 
     let total = 0;
 
-    productos.forEach((aroma) => {
-      const cantidad = carrito[aroma];
+    productos.forEach((id) => {
+      const item = carrito[id];
 
-      const subtotal = cantidad * precioTibetanos;
+      const datos = buscarProducto(id);
+
+      if (!datos) return;
+
+      const subtotal = item.cantidad * datos.precio;
 
       total += subtotal;
 
-      mensaje += `• Aromanza Tibetanos - ${aroma} × ${cantidad} — $${subtotal.toLocaleString("es-AR")}\n`;
+      mensaje += `• ${datos.categoria} - ${datos.nombre} × ${item.cantidad} — $${subtotal.toLocaleString("es-AR")}\n`;
     });
 
     mensaje += `\n💰 Total: $${total.toLocaleString("es-AR")}`;
 
-    // ========================================
-    // NÚMERO DE WHATSAPP
-    // ========================================
-
+    // CAMBIAR POR TU NÚMERO
     const numeroWhatsapp = "5491134262043";
 
     const url = `https://wa.me/${numeroWhatsapp}?text=${encodeURIComponent(mensaje)}`;
@@ -536,24 +502,6 @@ if (botonWhatsapp) {
     window.open(url, "_blank");
   });
 }
-
-// ========================================
-// ACTUALIZAR AL VOLVER A LA PÁGINA
-// ========================================
-
-window.addEventListener("pageshow", () => {
-  carrito = JSON.parse(localStorage.getItem("carrito")) || {};
-
-  actualizarCantidadesTibetanos();
-
-  actualizarBotonCarrito();
-});
-
-// ========================================
-// INICIALIZAR
-// ========================================
-
-actualizarBotonCarrito();
 
 // ========================================
 // BOTÓN VER CARRITO
@@ -566,3 +514,27 @@ if (botonCarrito) {
     window.location.href = "../../../carrito.html";
   });
 }
+
+// ========================================
+// ACTUALIZAR AL VOLVER
+// ========================================
+
+window.addEventListener("pageshow", () => {
+  carrito = JSON.parse(localStorage.getItem("carrito")) || {};
+
+  actualizarBotonCarrito();
+
+  if (document.getElementById("carrito")) {
+    mostrarCarrito();
+  }
+});
+
+// ========================================
+// INICIAR
+// ========================================
+
+cargarProductos();
+
+mostrarCarrito();
+
+actualizarBotonCarrito();
