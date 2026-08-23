@@ -374,7 +374,7 @@ const catalogo = {
   // ILUMINARTE - VELAS DE NOCHE
   // ========================================
 
-  iluminarteVelas: {
+  iluminarteVelasNoche: {
     nombre: "Iluminarte Velas de Noche",
     pagina: "iluminarte-velas",
     detalle: "12 unidades",
