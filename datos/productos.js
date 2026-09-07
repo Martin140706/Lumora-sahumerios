@@ -58,7 +58,7 @@ const catalogo = {
       {
         id: "tibetanos-lavandas-valle",
         nombre: "Lavandas del Valle - Anti Estrés",
-        stock: 3,
+        stock: 2,
       },
       {
         id: "tibetanos-manzana-canela",
@@ -108,12 +108,12 @@ const catalogo = {
       {
         id: "tibetanos-sandalo-hindu",
         nombre: "Sándalo Hindú - Purificación",
-        stock: 1,
+        stock: 0,
       },
       {
         id: "tibetanos-canela-mistica",
         nombre: "Canela Mística - Calidez",
-        stock: 2,
+        stock: 1,
       },
       {
         id: "tibetanos-choco-dubai",
@@ -384,7 +384,7 @@ const catalogo = {
       {
         id: "iluminarte-velas-noche",
         nombre: "Velas de noche",
-        stock: 1,
+        stock: 4,
       },
     ],
   },
@@ -440,6 +440,49 @@ const catalogo = {
   },
 
   // ========================================
+  // ILUMINARTE - SAHUMERIOS 40cm
+  // ========================================
+
+  iluminarte40cm: {
+    nombre: "Iluminarte Sahumerios de 40cm",
+    pagina: "iluminarte-sah-40cm",
+    detalle: "10 varillas",
+    precio: 3000,
+    productos: [
+      {
+        id: "iluminarte-40cm-citronella",
+        nombre: "Citronella - Anti Mosquitos",
+        stock: 2,
+      },
+      {
+        id: "iluminarte-40cm-lavanda",
+        nombre: "Lavanda - Anti stress",
+        stock: 2,
+      },
+      {
+        id: "iluminarte-40cm-incienso",
+        nombre: "Inicienso - Iluminación",
+        stock: 1,
+      },
+      {
+        id: "iluminare-40cm-energiaLimpia",
+        nombre: "Energía Límpia - Limpieza energética",
+        stock: 1,
+      },
+      {
+        id: "iluminarte-40cm-vainilla",
+        nombre: "Vainilla - Abundancia",
+        stock: 1,
+      },
+      {
+        id: "iluminarte-40cm-mangoMaracuya",
+        nombre: "Mango Maracuyá - Felicidad",
+        stock: 1,
+      },
+    ],
+  },
+
+  // ========================================
   // ILUMINARTE - SAHUMERIOS RECTANGULARES
   // ========================================
 
@@ -453,13 +496,13 @@ const catalogo = {
       {
         id: "iluminarte-rectangulares-chocolate",
         nombre: "Chocolate",
-        stock: 1,
+        stock: 2,
       },
 
       {
         id: "iluminarte-rectangulares-anana",
         nombre: "Ananá",
-        stock: 1,
+        stock: 2,
       },
 
       {
@@ -483,7 +526,7 @@ const catalogo = {
       {
         id: "iluminarte-rectangulares-lima",
         nombre: "Lima",
-        stock: 1,
+        stock: 4,
       },
 
       {
@@ -501,12 +544,106 @@ const catalogo = {
       {
         id: "iluminarte-rectangulares-dulce-rosa",
         nombre: "Dulce Rosa",
-        stock: 1,
+        stock: 0,
       },
 
       {
         id: "iluminarte-rectangulares-sandia",
         nombre: "Sandía",
+        stock: 1,
+      },
+    ],
+  },
+  sagradaMadre: {
+    nombre: "Sagrada Madre Sahumerios",
+    pagina: "sagrada-madre-sahumerios",
+    detalle: "20 varillas",
+    precio: 4200,
+    productos: [
+      {
+        id: "sagrada-madre-palo-santo",
+        nombre: "Palo santo",
+        stock: 1,
+      },
+      {
+        id: "sagrada-madre-palo-santo-rosa",
+        nombre: "Palo santo con rosa",
+        stock: 1,
+      },
+    ],
+  },
+  defumacion: {
+    nombre: "Defumacion",
+    pagina: "categoriaDefumación",
+    detalle: "",
+
+    productos: [
+      {
+        id: "defumacion-conitos",
+        nombre: "Conitos defumación x unidad",
+        precio: 400,
+        stock: 17,
+      },
+
+      {
+        id: "defumacion-bombitas",
+        nombre: "Bombitas de defumación x unidad",
+        precio: 250,
+        stock: 40,
+      },
+      {
+        id: "defumacion-cuenco",
+        nombre: "Cuenco pintado para defumar",
+        precio: 3200,
+        stock: 2,
+      },
+    ],
+  },
+  cascadasHumo: {
+    nombre: "Cascadas de humo",
+    pagina: "categoriaCascada",
+    detalle: "varios modelos",
+    precio: 3000,
+    productos: [
+      {
+        id: "cascadaHumoCh-modelo7",
+        nombre: "Cascada de humo modelo 7",
+        stock: 1,
+      },
+      {
+        id: "cascadaHumoCh-modelo9",
+        nombre: "Cascada de humo modelo 9",
+        stock: 1,
+      },
+    ],
+  },
+  conitosCascada: {
+    nombre: "Conitos Cascada",
+    pagina: "conitos-cascada",
+    detalle: "",
+    productos: [
+      {
+        id: "conitos-norm-5",
+        nombre: "Conitos normales x5",
+        precio: 700,
+        stock: 4,
+      },
+      {
+        id: "conitos-norm-10",
+        nombre: "Conitos normales x10",
+        precio: 1200,
+        stock: 2,
+      },
+      {
+        id: "conitos-xl-5",
+        nombre: "Conitos XL x5",
+        precio: 900,
+        stock: 2,
+      },
+      {
+        id: "conitos-xl-10",
+        nombre: "Conitos XL x10",
+        precio: 1500,
         stock: 1,
       },
     ],
