@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Administración | Lumora</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="script.js" defer></script>
+  </head>
+  <body>
+    <header class="encabezado">
+      <div>
+        <p class="marca">LUMORA</p>
+        <h1>Panel de administración</h1>
+        <p class="subtitulo">Gestioná tus productos, precios y stock.</p>
+      </div>
+      <span class="estado">
+        <span class="punto"></span>
+        Panel local
+      </span>
+    </header>
+
+    <main class="contenedor">
+      <section class="resumen">
+        <article class="tarjeta">
+          <span>Total de productos</span>
+          <strong id="total-productos">—</strong>
+        </article>
+        <article class="tarjeta">
+          <span>Productos disponibles</span>
+          <strong id="disponibles">—</strong>
+        </article>
+        <article class="tarjeta">
+          <span>Productos agotados</span>
+          <strong id="agotados">—</strong>
+        </article>
+      </section>
+
+      <section class="catalogo">
+        <div class="catalogo-encabezado">
+          <div>
+            <h2>Catálogo</h2>
+            <p>Los cambios se guardan en la base de datos.</p>
+          </div>
+          <button id="recargar" class="boton boton-secundario" type="button">
+            ↻ Actualizar
+          </button>
+        </div>
+
+        <div class="filtros">
+          <input
+            id="buscador"
+            type="search"
+            placeholder="Buscar producto..."
+            aria-label="Buscar producto"
+          />
+
+          <select id="filtro-categoria" aria-label="Filtrar por categoría">
+            <option value="">Todas las categorías</option>
+          </select>
+
+          <select id="filtro-stock" aria-label="Filtrar por stock">
+            <option value="">Todo el stock</option>
+            <option value="disponible">Disponibles</option>
+            <option value="agotado">Agotados</option>
+          </select>
+        </div>
+
+        <p id="mensaje" class="mensaje" role="status" aria-live="polite">
+          Cargando catálogo...
+        </p>
+
+        <div class="tabla-contenedor">
+          <table>
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th>Categoría</th>
+                <th>Precio ($)</th>
+                <th>Stock</th>
+                <th>Acción</th>
+              </tr>
+            </thead>
+            <tbody id="tabla-productos"></tbody>
+          </table>
+        </div>
+
+        <p class="nota">
+          Los precios generales se comparten entre los productos de su
+          categoría. Al guardar uno de ellos, se actualizará toda esa categoría.
+        </p>
+      </section>
+    </main>
+
+    <footer>Lumora · Administración de productos</footer>
+  </body>
+</html>

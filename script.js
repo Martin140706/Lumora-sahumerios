@@ -5,6 +5,19 @@
 let carrito = JSON.parse(localStorage.getItem("carrito")) || {};
 
 // ========================================
+// CATÁLOGO
+// ========================================
+
+let catalogo = {};
+let cargandoProductos = false;
+
+// ========================================
+// URL DE LA API
+// ========================================
+
+const API_URL = "http://localhost:3000";
+
+// ========================================
 // GUARDAR CARRITO
 // ========================================
 
@@ -87,83 +100,142 @@ function obtenerPrecioProducto(producto, datos) {
 }
 
 // ========================================
-// ¿MUESTRA PRECIO INDIVIDUAL?
+// CARGAR PRODUCTOS DESDE LA API
 // ========================================
 
-function muestraPrecioIndividual(producto, datos) {
-  return datos.precioIndividual === true || producto.precio !== undefined;
-}
-
-// ========================================
-// CARGAR PRODUCTOS
-// ========================================
-
-function cargarProductos() {
+async function cargarProductos() {
   const lista = document.getElementById("lista-productos");
 
-  if (!lista) return;
+  // Evitar que se carguen los productos dos veces al mismo tiempo
+  if (cargandoProductos) return;
 
-  lista.innerHTML = "";
+  cargandoProductos = true;
 
-  const categoria = obtenerCategoria();
-
-  const datos = catalogo[categoria];
-
-  if (!datos) {
-    console.warn("No se encontró la categoría:", categoria);
-
-    lista.innerHTML = `
-      <p>
-        No se encontró esta categoría.
-      </p>
-    `;
-
-    return;
+  if (lista) {
+    lista.innerHTML = "";
   }
 
-  // ========================================
-  // TÍTULO
-  // ========================================
+  try {
+    const respuesta = await fetch(`${API_URL}/api/productos`);
 
-  const titulo = document.getElementById("titulo-producto");
+    if (!respuesta.ok) {
+      throw new Error("No se pudieron obtener los productos");
+    }
 
-  if (titulo) {
-    titulo.textContent = datos.nombre;
-  }
+    const productos = await respuesta.json();
 
-  // ========================================
-  // DESCRIPCIÓN
-  // ========================================
+    // ========================================
+    // ARMAR CATÁLOGO
+    // ========================================
 
-  const descripcion = document.getElementById("descripcion-producto");
+    catalogo = {};
 
-  if (descripcion) {
-    const tienePrecioGeneral = datos.precio !== undefined;
+    productos.forEach((producto) => {
+      const claveCategoria = producto.pagina;
 
-    descripcion.innerHTML = `
-      ${datos.productos.length} productos
-      ${datos.detalle ? ` · ${datos.detalle}` : ""}
-      ${
-        tienePrecioGeneral
-          ? `
-            ·
-            <span class="precio-producto">
-              $${datos.precio.toLocaleString("es-AR")}
-            </span>
-          `
-          : ""
+      if (!catalogo[claveCategoria]) {
+        catalogo[claveCategoria] = {
+          nombre: producto.categoria,
+          pagina: producto.pagina,
+          detalle: producto.detalle || "",
+
+          precio:
+            producto.precio_general !== null
+              ? Number(producto.precio_general)
+              : undefined,
+
+          productos: [],
+        };
       }
-    `;
+
+      catalogo[claveCategoria].productos.push({
+        id: producto.id,
+        nombre: producto.nombre,
+        precio: Number(producto.precio),
+        stock: Number(producto.stock),
+      });
+    });
+    // Si estamos en carrito.html, cargamos el catálogo
+    // para poder buscar los productos, sin dibujar la lista.
+    if (!lista) return;
+
+    // ========================================
+    // DETECTAR CATEGORÍA
+    // ========================================
+
+    const categoria = obtenerCategoria();
+
+    const datos = catalogo[categoria];
+
+    if (!datos) {
+      console.warn("No se encontró la categoría:", categoria);
+
+      lista.innerHTML = `
+        <p>
+          No se encontró esta categoría.
+        </p>
+      `;
+
+      return;
+    }
+
+    // ========================================
+    // TÍTULO
+    // ========================================
+
+    const titulo = document.getElementById("titulo-producto");
+
+    if (titulo) {
+      titulo.textContent = datos.nombre;
+    }
+
+    // ========================================
+    // DESCRIPCIÓN
+    // ========================================
+
+    const descripcion = document.getElementById("descripcion-producto");
+
+    if (descripcion) {
+      const tienePrecioGeneral = datos.precio !== undefined;
+
+      descripcion.innerHTML = `
+        ${datos.productos.length} productos
+        ${datos.detalle ? ` · ${datos.detalle}` : ""}
+        ${
+          tienePrecioGeneral
+            ? `
+              ·
+              <span class="precio-producto">
+                $${datos.precio.toLocaleString("es-AR")}
+              </span>
+            `
+            : ""
+        }
+      `;
+    }
+
+    // ========================================
+    // CREAR PRODUCTOS
+    // ========================================
+
+    datos.productos.forEach((productoDatos) => {
+      crearProducto(lista, productoDatos, datos);
+    });
+  } catch (error) {
+    console.error("Error al cargar productos:", error);
+
+    if (lista) {
+      lista.innerHTML = `
+        <p>
+          No se pudieron cargar los productos.
+        </p>
+      `;
+    }
+  } finally {
+    cargandoProductos = false;
   }
-
-  // ========================================
-  // CREAR PRODUCTOS
-  // ========================================
-
-  datos.productos.forEach((productoDatos) => {
-    crearProducto(lista, productoDatos, datos);
-  });
 }
+
 // ========================================
 // CREAR PRODUCTO
 // ========================================
@@ -173,6 +245,10 @@ function crearProducto(lista, productoDatos, datos) {
   const nombre = productoDatos.nombre;
   const stock = productoDatos.stock;
   const precio = obtenerPrecioProducto(productoDatos, datos);
+
+  // Si la categoría tiene precio general,
+  // no mostramos el precio en cada producto.
+  const precioIndividual = datos.precio === undefined;
 
   const producto = document.createElement("div");
 
@@ -186,12 +262,13 @@ function crearProducto(lista, productoDatos, datos) {
   if (stock <= 0) {
     producto.innerHTML = `
       <div class="producto-info">
+
         <span class="nombre-producto">
           ${nombre}
         </span>
 
         ${
-          productoDatos.precio !== undefined
+          precioIndividual
             ? `
               <span class="precio-lista">
                 $${precio.toLocaleString("es-AR")}
@@ -199,6 +276,7 @@ function crearProducto(lista, productoDatos, datos) {
             `
             : ""
         }
+
       </div>
 
       <span class="agotado">
@@ -229,7 +307,7 @@ function crearProducto(lista, productoDatos, datos) {
       </span>
 
       ${
-        productoDatos.precio !== undefined
+        precioIndividual
           ? `
             <span class="precio-lista">
               $${precio.toLocaleString("es-AR")}
@@ -550,50 +628,134 @@ if (botonVaciar) {
 }
 
 // ========================================
-// WHATSAPP
+// WHATSAPP Y CONFIRMACIÓN DEL PEDIDO
 // ========================================
 
 const botonWhatsapp = document.getElementById("whatsapp");
 
 if (botonWhatsapp) {
-  botonWhatsapp.addEventListener("click", () => {
-    const productos = Object.keys(carrito);
+  botonWhatsapp.addEventListener("click", async () => {
+    const ids = Object.keys(carrito);
 
-    if (productos.length === 0) {
+    if (ids.length === 0) {
       alert("Tu carrito está vacío.");
-
       return;
     }
 
-    let mensaje = "Hola! 👋 Quiero hacer el siguiente pedido:\n\n";
+    // Verificar que todos los productos existan en el catálogo
+    const items = [];
 
-    let total = 0;
-
-    productos.forEach((id) => {
+    for (const id of ids) {
       const item = carrito[id];
-
       const datos = buscarProducto(id);
 
-      if (!datos) return;
+      if (!datos || !Number.isSafeInteger(item.cantidad) || item.cantidad < 1) {
+        alert(
+          "No pudimos verificar todos los productos. " +
+            "Recargá la página e intentá nuevamente.",
+        );
+        return;
+      }
 
-      const subtotal = item.cantidad * datos.precio;
+      items.push({
+        id,
+        cantidad: item.cantidad,
+        datos,
+      });
+    }
 
+    let mensaje = "Hola! 👋 Quiero hacer el siguiente pedido:\n\n";
+    let total = 0;
+
+    for (const item of items) {
+      const subtotal = item.cantidad * item.datos.precio;
       total += subtotal;
 
-      mensaje += `• ${datos.categoria} - ${datos.nombre} × ${item.cantidad} — $${subtotal.toLocaleString(
-        "es-AR",
-      )}\n`;
-    });
+      mensaje +=
+        `• ${item.datos.categoria} - ${item.datos.nombre}` +
+        ` × ${item.cantidad} — ` +
+        `$${subtotal.toLocaleString("es-AR")}\n`;
+    }
 
     mensaje += `\n💰 Total: $${total.toLocaleString("es-AR")}`;
 
+    // Mantener el número de WhatsApp de Lumora
     const numeroWhatsapp = "5491134262043";
 
-    const url = `https://wa.me/${numeroWhatsapp}?text=${encodeURIComponent(
-      mensaje,
-    )}`;
+    const url =
+      `https://wa.me/${numeroWhatsapp}?text=` + encodeURIComponent(mensaje);
 
-    window.open(url, "_blank");
+    // Abrir una pestaña desde el clic para evitar
+    // que el navegador bloquee WhatsApp después del fetch.
+    const ventanaWhatsapp = window.open("about:blank", "_blank");
+
+    if (!ventanaWhatsapp) {
+      alert(
+        "El navegador bloqueó la nueva pestaña. " +
+          "Permití las ventanas emergentes e intentá nuevamente.",
+      );
+      return;
+    }
+
+    botonWhatsapp.disabled = true;
+
+    try {
+      const respuesta = await fetch(`${API_URL}/api/pedidos`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          productos: items.map(({ id, cantidad }) => ({
+            id,
+            cantidad,
+          })),
+        }),
+      });
+
+      const resultado = await respuesta.json();
+
+      if (!respuesta.ok) {
+        throw new Error(resultado.error || "No se pudo procesar el pedido.");
+      }
+
+      // Actualizar el stock del catálogo local
+      for (const actualizado of resultado.productos) {
+        for (const categoria in catalogo) {
+          const producto = catalogo[categoria].productos.find(
+            (p) => p.id === actualizado.id,
+          );
+
+          if (producto) {
+            producto.stock = actualizado.stockRestante;
+          }
+        }
+      }
+
+      // Abrir WhatsApp solamente si el stock se descontó
+      ventanaWhatsapp.location.href = url;
+
+      // Vaciar el carrito después de confirmar el descuento
+      carrito = {};
+      guardarCarrito();
+
+      mostrarCarrito();
+      actualizarBotonCarrito();
+
+      alert(
+        "¡Pedido procesado con éxito! 🎉\n\n" +
+          "Se actualizó el stock y se abrió WhatsApp " +
+          "para enviar el pedido.",
+      );
+    } catch (error) {
+      ventanaWhatsapp.close();
+
+      console.error("Error al procesar el pedido:", error);
+
+      alert(error.message || "Ocurrió un error al procesar el pedido.");
+    } finally {
+      botonWhatsapp.disabled = false;
+    }
   });
 }
 
@@ -613,10 +775,26 @@ if (botonCarrito) {
 // ACTUALIZAR AL VOLVER
 // ========================================
 
-window.addEventListener("pageshow", () => {
+window.addEventListener("pageshow", async () => {
   carrito = JSON.parse(localStorage.getItem("carrito")) || {};
 
   actualizarBotonCarrito();
+
+  // ========================================
+  // ESPERAR A QUE EL CATÁLOGO ESTÉ CARGADO
+  // ========================================
+
+  if (
+    (document.getElementById("lista-productos") ||
+      document.getElementById("carrito")) &&
+    Object.keys(catalogo).length === 0
+  ) {
+    await cargarProductos();
+  }
+
+  // ========================================
+  // ACTUALIZAR CANTIDADES
+  // ========================================
 
   const lista = document.querySelector("[id^='lista-'], #lista-productos");
 
@@ -703,11 +881,15 @@ if (volverAbajo) {
 // INICIAR
 // ========================================
 
-cargarProductos();
+async function iniciarTienda() {
+  actualizarBotonCarrito();
 
-mostrarCarrito();
+  await cargarProductos();
 
-actualizarBotonCarrito();
+  mostrarCarrito();
+}
+
+iniciarTienda();
 
 if (
   !window.location.pathname.endsWith("index.html") &&
