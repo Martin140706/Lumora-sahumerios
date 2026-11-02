@@ -18,9 +18,27 @@
         <span class="punto"></span>
         Panel local
       </span>
+      <button id="cerrar-sesion" class="boton" hidden>Cerrar sesión</button>
     </header>
+    <section id="login-admin" class="login-admin">
+      <h2>Acceso de administrador</h2>
+      <p>Ingresá tu contraseña para gestionar Lumora.</p>
 
-    <main class="contenedor">
+      <form id="form-login">
+        <label for="password-admin">Contraseña</label>
+        <input
+          type="password"
+          id="password-admin"
+          placeholder="Tu contraseña"
+          required
+        />
+
+        <button type="submit" class="boton">Iniciar sesión</button>
+
+        <p id="mensaje-login" role="alert"></p>
+      </form>
+    </section>
+    <main class="contenedor" id="contenido-admin" hidden>
       <section class="resumen">
         <article class="tarjeta">
           <span>Total de productos</span>
@@ -42,10 +60,86 @@
             <h2>Catálogo</h2>
             <p>Los cambios se guardan en la base de datos.</p>
           </div>
-          <button id="recargar" class="boton boton-secundario" type="button">
-            ↻ Actualizar
-          </button>
+
+          <div class="acciones-catalogo">
+            <button id="abrir-formulario-categoria" class="boton" type="button">
+              + Agregar categoría
+            </button>
+            <button id="abrir-formulario" class="boton" type="button">
+              + Agregar producto
+            </button>
+
+            <button id="recargar" class="boton boton-secundario" type="button">
+              ↻ Actualizar
+            </button>
+          </div>
         </div>
+
+        <section id="formulario-producto" class="formulario-producto" hidden>
+          <h3>Agregar producto</h3>
+          <p>Completá los datos del nuevo producto.</p>
+
+          <form id="form-agregar-producto">
+            <label for="nuevo-nombre">Nombre del producto</label>
+            <input
+              id="nuevo-nombre"
+              name="nombre"
+              type="text"
+              maxlength="150"
+              placeholder="Ej. Sahumerio de vainilla"
+              required
+            />
+
+            <label for="nueva-categoria">Categoría</label>
+            <select id="nueva-categoria" name="categoria_id" required>
+              <option value="">Seleccioná una categoría</option>
+            </select>
+
+            <label for="nuevo-id">ID del producto (opcional)</label>
+            <input
+              id="nuevo-id"
+              name="id"
+              type="text"
+              maxlength="150"
+              placeholder="Se genera automáticamente si lo dejás vacío"
+            />
+
+            <label for="nuevo-precio">Precio ($)</label>
+            <input
+              id="nuevo-precio"
+              name="precio"
+              type="number"
+              min="0"
+              step="0.01"
+              required
+            />
+
+            <label for="nuevo-stock">Stock inicial</label>
+            <input
+              id="nuevo-stock"
+              name="stock"
+              type="number"
+              min="0"
+              step="1"
+              value="0"
+              required
+            />
+
+            <div class="acciones-formulario">
+              <button class="boton" type="submit" id="guardar-nuevo-producto">
+                Guardar producto
+              </button>
+
+              <button
+                class="boton boton-secundario"
+                type="button"
+                id="cancelar-nuevo-producto"
+              >
+                Cancelar
+              </button>
+            </div>
+          </form>
+        </section>
 
         <div class="filtros">
           <input
@@ -65,6 +159,82 @@
             <option value="agotado">Agotados</option>
           </select>
         </div>
+
+        <section id="formulario-categoria" class="formulario-producto" hidden>
+          <h3>Agregar categoría</h3>
+          <p>Creá una categoría nueva para organizar tus productos.</p>
+
+          <form id="form-agregar-categoria">
+            <label for="categoria-nombre">Nombre de la categoría</label>
+            <input
+              id="categoria-nombre"
+              name="nombre"
+              type="text"
+              maxlength="150"
+              placeholder="Ej. Sahumerios artesanales"
+              required
+            />
+
+            <label for="categoria-pagina">Página o identificador</label>
+            <input
+              id="categoria-pagina"
+              name="pagina"
+              type="text"
+              maxlength="150"
+              placeholder="Ej. difusoresAuto"
+              required
+            />
+
+            <label for="categoria-pagina-padre">
+              Mostrar categoría dentro de:
+            </label>
+            <select id="categoria-pagina-padre" name="pagina_padre" required>
+              <option value="">Seleccioná una página</option>
+              <option value="inicio">Página principal</option>
+              <option value="aromanza">Aromanza</option>
+              <option value="iluminarte">Iluminarte</option>
+              <option value="sagradaMadre">Sagrada Madre</option>
+              <option value="cascadasHumo">Cascadas de humo</option>
+              <option value="humidificadores">Humidificadores</option>
+              <option value="bangladesh">Bangladesh</option>
+            </select>
+
+            <label for="categoria-detalle">Detalle</label>
+            <input
+              id="categoria-detalle"
+              name="detalle"
+              type="text"
+              maxlength="255"
+              placeholder="Descripción o detalle de la categoría"
+            />
+
+            <label for="categoria-precio-general">
+              Precio general (opcional)
+            </label>
+            <input
+              id="categoria-precio-general"
+              name="precio_general"
+              type="number"
+              min="0"
+              step="0.01"
+              placeholder="Dejalo vacío si cada producto tiene su precio"
+            />
+
+            <div class="acciones-formulario">
+              <button id="guardar-nueva-categoria" class="boton" type="submit">
+                Guardar categoría
+              </button>
+
+              <button
+                id="cancelar-nueva-categoria"
+                class="boton boton-secundario"
+                type="button"
+              >
+                Cancelar
+              </button>
+            </div>
+          </form>
+        </section>
 
         <p id="mensaje" class="mensaje" role="status" aria-live="polite">
           Cargando catálogo...
@@ -88,6 +258,47 @@
         <p class="nota">
           Los precios generales se comparten entre los productos de su
           categoría. Al guardar uno de ellos, se actualizará toda esa categoría.
+        </p>
+      </section>
+      <section class="catalogo categorias-admin">
+        <div class="catalogo-encabezado">
+          <div>
+            <h2>Administrar categorías</h2>
+            <p>Consultá y gestioná las categorías de Lumora.</p>
+          </div>
+
+          <button
+            id="recargar-categorias"
+            class="boton boton-secundario"
+            type="button"
+          >
+            ↻ Actualizar
+          </button>
+        </div>
+
+        <div class="tabla-contenedor">
+          <table>
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Identificador</th>
+                <th>Página</th>
+                <th>Precio general</th>
+                <th>Acción</th>
+              </tr>
+            </thead>
+
+            <tbody id="tabla-categorias"></tbody>
+          </table>
+        </div>
+
+        <p
+          id="mensaje-categorias"
+          class="mensaje"
+          role="status"
+          aria-live="polite"
+        >
+          Cargando categorías...
         </p>
       </section>
     </main>
