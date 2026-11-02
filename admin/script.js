@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:3000";
+const API_URL = "https://lumora-api-ecb1.onrender.com";
 
 const TOKEN_KEY = "lumora_admin_token";
 

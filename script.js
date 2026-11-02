@@ -15,7 +15,7 @@ let cargandoProductos = false;
 // URL DE LA API
 // ========================================
 
-const API_URL = "http://localhost:3000";
+const API_URL = "https://lumora-api-ecb1.onrender.com";
 
 // ========================================
 // GUARDAR CARRITO

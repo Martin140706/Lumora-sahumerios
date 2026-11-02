@@ -1,4 +1,4 @@
-const API_URL_CATEGORIAS = "http://localhost:3000";
+const API_URL_CATEGORIAS = "https://lumora-api-ecb1.onrender.com";
 
 async function cargarCategoriasAromanza() {
   const contenedor = document.getElementById("categorias-iluminarte");

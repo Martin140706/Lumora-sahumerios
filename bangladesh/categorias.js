@@ -1,4 +1,4 @@
-const API_URL_BANGLADESH = "http://localhost:3000";
+const API_URL_BANGLADESH = "https://lumora-api-ecb1.onrender.com";
 
 async function cargarCategoriasBangladesh() {
   const contenedor = document.getElementById("categorias-bangladesh");

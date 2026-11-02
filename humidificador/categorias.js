@@ -1,4 +1,4 @@
-const API_URL_HUMIDIFICADORES = "http://localhost:3000";
+const API_URL_HUMIDIFICADORES = "https://lumora-api-ecb1.onrender.com";
 
 async function cargarCategoriasHumidificadores() {
   const contenedor = document.getElementById("categorias-humidificadores");
